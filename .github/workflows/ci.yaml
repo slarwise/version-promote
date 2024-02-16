@@ -19,5 +19,7 @@ jobs:
           ./scripts/update-image-tag dev $IMAGE "$HASH"
       - name: Commit and push to main
         run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "bot@github.com"
           git commit -a -m "Update image tag in dev"
           git push
