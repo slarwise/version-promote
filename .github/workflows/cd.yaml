@@ -29,6 +29,7 @@ jobs:
           git config user.name $BOT_USER
           git config user.email $BOT_EMAIL
           git commit -a -m "Update image tag in dev"
+          git pull --rebase
           git push
       - name: Update the image tag in prod
         run: |
@@ -43,5 +44,6 @@ jobs:
           git config user.email $BOT_EMAIL
           git checkout -b $BRANCH_NAME
           git commit -a -m "Update image tag in prod"
+          git pull --rebase
           git push --set-upstream origin $BRANCH_NAME
           gh pr create --fill
