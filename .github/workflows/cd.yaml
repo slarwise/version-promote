@@ -45,7 +45,7 @@ jobs:
       - name: Build and push image
         run: |
           IMAGE="ghcr.io/slarwise/version-promote:${TAG}"
-          docker build --tag $"IMAGE" .
+          docker build --tag "$IMAGE" .
           docker push "$IMAGE"
   update-image-tags:
     runs-on: ubuntu-latest
