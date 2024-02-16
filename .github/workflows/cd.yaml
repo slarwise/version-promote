@@ -16,8 +16,23 @@ env:
   BOT_USER: "github-actions[bot]"
   BOT_EMAIL: "bot@github.com"
 jobs:
+  compute-image-tag:
+    runs-on: ubuntu-latest
+    outputs:
+      image-tag: ${{ steps.compute-image-tag.output.tag }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Compute image tag (use the current commit hash)
+        id: compute-image-tag
+        run: |
+          IMAGE_TAG="$(./scripts/get-current-commit-hash)"
+          echo "image_tag=${IMAGE_TAG}" >> "$GITHUB_OUTPUT"
   update-image-tags:
     runs-on: ubuntu-latest
+    needs: compute-image-tag
+    env:
+      TAG: ${{ needs.compute-image-tag.outputs.image-tag }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -25,27 +40,23 @@ jobs:
         run: |
           git config user.name $BOT_USER
           git config user.email $BOT_EMAIL
-      - name: Export the new image tag (use the current commit hash)
-        run: |
-          NEW_TAG="$(./scripts/get-current-commit-hash)"
-          echo "NEW_TAG=${NEW_TAG}" >> "$GITHUB_ENV"
       - name: Update the image tag in dev
         run: |
-          ./scripts/update-image-tag dev "$IMAGE" "$NEW_TAG"
+          ./scripts/update-image-tag dev "$IMAGE" "$TAG"
       - name: Commit and push to main
         run: |
-          git commit -a -m "Update image tag in dev to ${NEW_TAG}"
+          git commit -a -m "Update image tag in dev to ${TAG}"
           git pull --rebase
           git push
       - name: Update the image tag in prod
         run: |
-          ./scripts/update-image-tag prod "$IMAGE" "$NEW_TAG"
+          ./scripts/update-image-tag prod "$IMAGE" "$TAG"
       - name: Create PR
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          BRANCH_NAME="update-prod-tag-${NEW_TAG}"
+          BRANCH_NAME="update-prod-tag-${TAG}"
           git checkout -b "$BRANCH_NAME"
-          git commit -a -m "Update image tag in prod to ${NEW_TAG}"
+          git commit -a -m "Update image tag in prod to ${TAG}"
           git push --set-upstream origin "$BRANCH_NAME"
           gh pr create --fill
