@@ -1,7 +1,7 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - ../../base
+- ../../base
 images:
-  - name: version-promote
-    newTag: 0.0.1
+- name: version-promote
+  newTag: df1bb81
