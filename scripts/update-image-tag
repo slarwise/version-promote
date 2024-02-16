@@ -15,9 +15,9 @@ if [ "$#" -ne 3 ]; then
 fi
 
 if [ "$ENV" == "dev" ]; then
-    (cd k8s/overlays/dev && kustomize edit set image nginx:"$TAG")
+    (cd k8s/overlays/dev && kustomize edit set image "$IMAGE":"$TAG")
 elif [ "$ENV" == "prod" ]; then
-    (cd k8s/overlays/prod && kustomize edit set image nginx:"$TAG")
+    (cd k8s/overlays/prod && kustomize edit set image "$IMAGE":"$TAG")
 else
     echo "Environment must be one of dev or prod, got ${ENV}"
     exit 1
