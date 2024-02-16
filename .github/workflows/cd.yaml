@@ -27,7 +27,7 @@ jobs:
         id: compute-image-tag
         run: |
           IMAGE_TAG="$(./scripts/get-current-commit-hash)"
-          echo "image_tag=${IMAGE_TAG}" >> "$GITHUB_OUTPUT"
+          echo "image-tag=${IMAGE_TAG}" >> "$GITHUB_OUTPUT"
   update-image-tags:
     runs-on: ubuntu-latest
     needs: compute-image-tag
