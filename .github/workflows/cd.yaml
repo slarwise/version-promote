@@ -21,31 +21,31 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Export the current commit hash
-        run: |
-          HASH="$(./scripts/get-current-commit-hash)"
-          echo "HASH=${HASH}" >> "$GITHUB_ENV"
-      - name: Update the image tag in dev
-        run: |
-          ./scripts/update-image-tag dev "$IMAGE" "$HASH"
-      - name: Commit and push to main
+      - name: Set username and email
         run: |
           git config user.name $BOT_USER
           git config user.email $BOT_EMAIL
-          git commit -a -m "Update image tag in dev"
+      - name: Export the new image tag (use the current commit hash)
+        run: |
+          NEW_TAG="$(./scripts/get-current-commit-hash)"
+          echo "NEW_TAG=${NEW_TAG}" >> "$GITHUB_ENV"
+      - name: Update the image tag in dev
+        run: |
+          ./scripts/update-image-tag dev "$IMAGE" "$NEW_TAG"
+      - name: Commit and push to main
+        run: |
+          git commit -a -m "Update image tag in dev to ${NEW_TAG}"
           git pull --rebase
           git push
       - name: Update the image tag in prod
         run: |
-          ./scripts/update-image-tag prod "$IMAGE" "$HASH"
+          ./scripts/update-image-tag prod "$IMAGE" "$NEW_TAG"
       - name: Create PR
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          BRANCH_NAME="update-prod-tag-${HASH}"
-          git config user.name "$BOT_USER"
-          git config user.email "$BOT_EMAIL"
+          BRANCH_NAME="update-prod-tag-${NEW_TAG}"
           git checkout -b "$BRANCH_NAME"
-          git commit -a -m "Update image tag in prod"
+          git commit -a -m "Update image tag in prod to ${NEW_TAG}"
           git push --set-upstream origin "$BRANCH_NAME"
           gh pr create --fill
