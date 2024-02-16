@@ -11,6 +11,8 @@ on:
       - 'scripts/**'
 env:
   IMAGE: version-promote
+  BOT_USER: "github-actions[bot]"
+  BOT_EMAIL: "bot@github.com"
 jobs:
   update-image-tag-dev:
     runs-on: ubuntu-latest
@@ -23,7 +25,26 @@ jobs:
           ./scripts/update-image-tag dev $IMAGE "$HASH"
       - name: Commit and push to main
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "bot@github.com"
+          git config user.name $BOT_USER
+          git config user.email $BOT_EMAIL
           git commit -a -m "Update image tag in dev"
           git push
+  create-update-image-tag-prod-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set the image tag to the current commit
+        run: |
+          HASH="$(./scripts/get-current-commit-hash)"
+          ./scripts/update-image-tag prod $IMAGE "$HASH"
+      - name: Create PR
+        env:
+          BRANCH_NAME: update-prod-tag
+        run: |
+          git config user.name $BOT_USER
+          git config user.email $BOT_EMAIL
+          git checkout -b $BRANCH_NAME
+          git commit -a -m "Update image tag in prod"
+          git push --set-upstream origin $BRANCH_NAME
+          gh pr create --fill
