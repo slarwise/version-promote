@@ -19,7 +19,7 @@ jobs:
   compute-image-tag:
     runs-on: ubuntu-latest
     outputs:
-      image-tag: ${{ steps.compute-image-tag.output.image-tag }}
+      image-tag: ${{ steps.compute-image-tag.output.image_tag }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,12 +27,12 @@ jobs:
         id: compute-image-tag
         run: |
           IMAGE_TAG="$(./scripts/get-current-commit-hash)"
-          echo "image-tag=${IMAGE_TAG}" >> "$GITHUB_OUTPUT"
+          echo "image_tag=${IMAGE_TAG}" >> "$GITHUB_OUTPUT"
   update-image-tags:
     runs-on: ubuntu-latest
     needs: compute-image-tag
     env:
-      TAG: ${{ needs.compute-image-tag.outputs.image-tag }}
+      TAG: ${{needs.compute-image-tag.outputs.image-tag}}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
