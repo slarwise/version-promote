@@ -19,7 +19,7 @@ jobs:
   compute-image-tag:
     runs-on: ubuntu-latest
     outputs:
-      image-tag: ${{ steps.compute-image-tag.output.image_tag }}
+      image-tag: ${{ steps.compute-image-tag.output.image-tag }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
