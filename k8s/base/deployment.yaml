@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: version-promote
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: version-promote
+  template:
+    metadata:
+      labels:
+        app: version-promote
+    spec:
+      containers:
+        - name: version-promote
+          image: version-promote
+          ports:
+            - containerPort: 8080
+              name: http
