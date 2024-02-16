@@ -15,12 +15,12 @@ env:
   BOT_USER: "github-actions[bot]"
   BOT_EMAIL: "bot@github.com"
 jobs:
-  update-image-tag-dev:
+  update-image-tags:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Set the image tag to the current commit
+      - name: Update the image tag in dev
         run: |
           HASH="$(./scripts/get-current-commit-hash)"
           ./scripts/update-image-tag dev $IMAGE "$HASH"
@@ -30,12 +30,7 @@ jobs:
           git config user.email $BOT_EMAIL
           git commit -a -m "Update image tag in dev"
           git push
-  create-update-image-tag-prod-pr:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Set the image tag to the current commit
+      - name: Update the image tag in prod
         run: |
           HASH="$(./scripts/get-current-commit-hash)"
           ./scripts/update-image-tag prod $IMAGE "$HASH"
