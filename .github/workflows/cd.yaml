@@ -42,6 +42,7 @@ jobs:
       - name: Create PR
         env:
           BRANCH_NAME: update-prod-tag
+          GH_TOKEN: ${{ github.token }}
         run: |
           git config user.name $BOT_USER
           git config user.email $BOT_EMAIL
