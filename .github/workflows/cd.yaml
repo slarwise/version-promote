@@ -42,7 +42,6 @@ jobs:
         run: |
           git config user.name $BOT_USER
           git config user.email $BOT_EMAIL
-          git pull --rebase
           git checkout -b $BRANCH_NAME
           git commit -a -m "Update image tag in prod"
           git push --set-upstream origin $BRANCH_NAME
