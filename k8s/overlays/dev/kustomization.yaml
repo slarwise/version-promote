@@ -4,6 +4,6 @@ resources:
 - ../../base
 images:
 - name: nginx
-  newTag: d35ce9f
+  newTag: e4924d7
 - name: version-promote
   newTag: 0.0.1
