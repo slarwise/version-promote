@@ -1,0 +1,23 @@
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'k8s/**'
+      - 'README.md'
+env:
+  IMAGE: version-promote
+jobs:
+  update-image-tag-dev:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set the image tag to the current commit
+        run: |
+          HASH="$(./scripts/get-current-commit-hash)
+          ./scripts/update-image-tag dev $IMAGE "$HASH"
+      - name: Commit and push to main
+        run: |
+          git commit -a -m "Update image tag in dev"
+          git push
