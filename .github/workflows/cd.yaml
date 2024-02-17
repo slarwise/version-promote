@@ -81,4 +81,4 @@ jobs:
           git checkout -b "$BRANCH_NAME"
           git commit -a -m "Update image tag in prod to ${TAG}"
           git push --set-upstream origin "$BRANCH_NAME"
-          gh pr create --fill --label "$LABEL"
+          gh pr create --fill --label "$PR_LABEL"
