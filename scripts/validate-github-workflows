@@ -1,0 +1,15 @@
+#!/bin/bash
+
+TMP_DIR="$(mktemp -d)"
+trap "rm -rf ${TMP_DIR}" EXIT
+
+SCHEMA_URL="https://json.schemastore.org/github-workflow.json"
+SCHEMA_FILE="${TMP_DIR}/schema.json"
+curl --silent "$SCHEMA_URL" >"$SCHEMA_FILE"
+
+WORKFLOWS="./.github/workflows/*.yaml"
+for WORKFLOW in $WORKFLOWS; do
+    WORKFLOW_JSON_FILE="${TMP_DIR}/workflow.json"
+    yq --output-format json "$WORKFLOW" >"$WORKFLOW_JSON_FILE"
+    yajsv -q -s "$SCHEMA_FILE" "$WORKFLOW_JSON_FILE"
+done
