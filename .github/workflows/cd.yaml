@@ -71,6 +71,14 @@ jobs:
       - name: Update the image tag in prod
         run: |
           ./scripts/update-image-tag prod "$IMAGE" "$TAG"
+      - name: Close any previous PR's
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PRS="$(gh pr list --label update-image-tag-prod --json number | jq '.[].number')"
+          for PR in $PRS; do
+            gh pr close --delete-branch "$PR"
+          done
       - name: Create PR
         env:
           GH_TOKEN: ${{ github.token }}
