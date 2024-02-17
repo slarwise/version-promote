@@ -1,0 +1,8 @@
+#!/bin/bash
+
+LABEL="$1"
+
+PRS="$(gh pr list --label "$LABEL" --json number | jq '.[].number')"
+for PR in $PRS; do
+    gh pr close --delete-branch "$PR"
+done

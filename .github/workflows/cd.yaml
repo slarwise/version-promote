@@ -14,8 +14,6 @@ on:
       - 'scripts/**'
 env:
   IMAGE: version-promote
-  BOT_USER: "github-actions[bot]"
-  BOT_EMAIL: "bot@github.com"
 jobs:
   compute-image-tag:
     runs-on: ubuntu-latest
@@ -53,6 +51,10 @@ jobs:
     needs: compute-image-tag
     env:
       TAG: ${{ needs.compute-image-tag.outputs.image-tag }}
+      GH_TOKEN: ${{ github.token }}
+      BOT_USER: "github-actions[bot]"
+      BOT_EMAIL: "bot@github.com"
+      PR_LABEL: update-image-tag-prod
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -72,19 +74,12 @@ jobs:
         run: |
           ./scripts/update-image-tag prod "$IMAGE" "$TAG"
       - name: Close any previous PR's
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
-          PRS="$(gh pr list --label update-image-tag-prod --json number | jq '.[].number')"
-          for PR in $PRS; do
-            gh pr close --delete-branch "$PR"
-          done
+          ./scripts/close-all-update-matching-label "$PR_LABEL"
       - name: Create PR
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
           BRANCH_NAME="update-prod-tag-${TAG}"
           git checkout -b "$BRANCH_NAME"
           git commit -a -m "Update image tag in prod to ${TAG}"
           git push --set-upstream origin "$BRANCH_NAME"
-          gh pr create --fill --label update-image-tag-prod
+          gh pr create --fill --label "$LABEL"
