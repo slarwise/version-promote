@@ -75,7 +75,7 @@ jobs:
           ./scripts/update-image-tag prod "$IMAGE" "$TAG"
       - name: Close any previous PR's
         run: |
-          ./scripts/close-all-update-matching-label "$PR_LABEL"
+          ./scripts/close-all-prs-matching-label "$PR_LABEL"
       - name: Create PR
         run: |
           BRANCH_NAME="update-prod-tag-${TAG}"
