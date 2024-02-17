@@ -15,8 +15,6 @@ jobs:
         run: go build ./...
       - name: Run unit tests
         run: go test ./...
-      - name: Build image
-        run: docker build --tag test .
       - name: Build kubernetes dev overlay
         run: kustomize build ./k8s/overlays/dev
       - name: Build kubernetes prod overlay
@@ -29,3 +27,9 @@ jobs:
       - name: Validate prod kubernetes resource definitions
         run: |
           ./scripts/validate-k8s ./k8s/overlays/prod
+  build-image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build --tag test .
