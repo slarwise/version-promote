@@ -68,7 +68,6 @@ jobs:
       - name: Commit and push to main
         run: |
           git commit -a -m "Update image tag in dev to ${TAG}"
-          git pull --rebase
           git push
       - name: Update the image tag in prod
         run: |
