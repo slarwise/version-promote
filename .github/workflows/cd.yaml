@@ -12,8 +12,6 @@ on:
       - 'README.md'
       - '.github/**'
       - 'scripts/**'
-env:
-  IMAGE: version-promote
 jobs:
   compute-image-tag:
     runs-on: ubuntu-latest
@@ -55,6 +53,7 @@ jobs:
       BOT_USER: "github-actions[bot]"
       BOT_EMAIL: "bot@github.com"
       PR_LABEL: update-image-tag-prod
+      IMAGE: version-promote
     steps:
       - name: Checkout
         uses: actions/checkout@v4
