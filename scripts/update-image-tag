@@ -1,9 +1,5 @@
 #!/bin/bash
 
-ENV="$1"
-IMAGE="$2"
-TAG="$3"
-
 if [ "$#" -ne 3 ]; then
     echo "Usage: update-image-tag <environment> <image> <tag>"
     echo "    environment: dev | prod"
@@ -13,6 +9,10 @@ if [ "$#" -ne 3 ]; then
     echo "    update-image-tag dev nginx 0.0.2"
     exit 1
 fi
+
+ENV="$1"
+IMAGE="$2"
+TAG="$3"
 
 if [ "$ENV" == "dev" ]; then
     (cd k8s/overlays/dev && kustomize edit set image "$IMAGE":"$TAG")
