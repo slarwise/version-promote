@@ -15,6 +15,17 @@ jobs:
         run: go build ./...
       - name: Run unit tests
         run: go test ./...
+  validate-github-workflows:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+      - name: Install json schema validator
+        run: go install github.com/neilpa/yajsv@latest
+      - name: Validate workflows
+        run: ./scripts/validate-github-workflows
   validate-k8s:
     runs-on: ubuntu-latest
     steps:
