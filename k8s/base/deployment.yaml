@@ -12,6 +12,7 @@ spec:
       labels:
         app: version-promote
     spec:
+      asdf: 3
       containers:
         - name: version-promote
           image: version-promote
