@@ -4,4 +4,4 @@ resources:
 - ../../base
 images:
 - name: version-promote
-  newTag: 4b510d2
+  newTag: f88a573
