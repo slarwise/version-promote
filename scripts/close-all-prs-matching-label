@@ -1,8 +1,20 @@
 #!/bin/bash
 
-LABEL="$1"
+if [ "$#" -ne 1 ]; then
+    echo "Usage: ${0} <label>"
+    echo "    label: string"
+    echo "Environment variables"
+    echo "    DRY_RUN: If set to a non-empty string, only print what PR's would be closed"
+    echo "Example:"
+    echo "    ${0} new-image-tag/prod"
+    exit 1
+fi
 
 PRS="$(gh pr list --label "$LABEL" --json number | jq '.[].number')"
 for PR in $PRS; do
-    gh pr close --delete-branch "$PR"
+    if [ -z "$DRY_RUN" ]; then
+        gh pr close --delete-branch "$PR"
+    else
+        echo "Would close pull request ${PR}"
+    fi
 done
