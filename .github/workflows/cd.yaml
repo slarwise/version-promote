@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       dry_run:
-        description: "Only print what would be done if dry_run was set to false"
+        description: "Don't deploy anything, only print what would be done"
         required: false
         default: false
         type: boolean
