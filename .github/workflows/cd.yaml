@@ -1,3 +1,4 @@
+run-name: ${{ inputs.dry_run && '[DRY RUN] ' }}Push and deploy new image tags
 permissions:
   contents: write
   pull-requests: write
