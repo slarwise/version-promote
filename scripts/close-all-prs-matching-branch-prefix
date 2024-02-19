@@ -1,0 +1,26 @@
+#!/bin/bash
+
+if [ "$#" -ne 1 ]; then
+    echo "Usage: ${0} <prefix>"
+    echo "    prefix: string"
+    echo "Environment variables"
+    echo "    DRY_RUN: If set to a non-empty string, only print the PR's that would be closed"
+    echo "Example:"
+    echo "    ${0} promote/prod"
+    exit 1
+fi
+
+PREFIX="$1"
+
+PRS="$(gh pr list --json headRefName,number | jq --arg prefix "$PREFIX" 'map(select(.headRefName | startswith($prefix))) | .[].number')"
+if [ -z "$PRS" ]; then
+    echo "No pull requests found with branches starting with ${PREFIX}"
+    exit 0
+fi
+for PR in $PRS; do
+    if [ -z "$DRY_RUN" ]; then
+        gh pr close --delete-branch "$PR"
+    else
+        echo "Would close pull request ${PR}"
+    fi
+done

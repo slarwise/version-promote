@@ -62,9 +62,9 @@ jobs:
       GH_TOKEN: ${{ github.token }}
       BOT_USER: "github-actions[bot]"
       BOT_EMAIL: "bot@github.com"
-      PR_LABEL: update-image-tag-prod
       IMAGE: version-promote
       DRY_RUN: ${{ inputs.dry_run && 'true' || '' }}
+      PR_BRANCH_PREFIX: "promote/prod"
     steps:
       - uses: actions/checkout@v4
       - name: Set username and email
@@ -87,15 +87,15 @@ jobs:
           ./scripts/update-image-tag prod "$IMAGE" "$TAG"
       - name: Close any previous PR's
         run: |
-          ./scripts/close-all-prs-matching-label "$PR_LABEL"
+          ./scripts/close-all-prs-matching-branch-prefix "$PR_BRANCH_PREFIX"
       - name: Create PR
         run: |
-          BRANCH_NAME="update-prod-tag-${TAG}"
+          BRANCH_NAME="${PR_BRANCH_PREFIX}/${TAG}"
           git checkout -b "$BRANCH_NAME"
           if [ -z "$DRY_RUN" ]; then
             git commit -a -m "Update image tag in prod to ${TAG}"
             git push --set-upstream origin "$BRANCH_NAME"
-            gh pr create --fill --label "$PR_LABEL"
+            gh pr create --fill
           else
             echo "Would create PR for updated prod image. Tag: ${TAG}. Branch: ${BRANCH_NAME}" >> $GITHUB_STEP_SUMMARY
           fi
