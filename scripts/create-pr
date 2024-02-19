@@ -1,0 +1,15 @@
+#!/bin/bash
+
+if [ "$#" -ne 1 ]; then
+    echo "Usage: ${0} <branch>"
+    exit 1
+fi
+
+BRANCH="$1"
+
+if [ -z "$DRY_RUN" ]; then
+    git checkout "$BRANCH"
+    gh pr create --fill
+else
+    echo "Would create PR from branch ${BRANCH}"
+fi

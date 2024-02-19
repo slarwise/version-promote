@@ -1,34 +1,19 @@
 #!/bin/bash
 
-if [ "$#" -ne 3 ]; then
-    echo "Usage: ${0} <environment> <image> <tag>"
-    echo "    environment: dev | prod"
-    echo "    image: string"
-    echo "    tag: string"
+if [ "$#" -ne 2 ]; then
+    echo "Usage: ${0} <kustomize-dir> <image>"
     echo "Environment variables"
     echo "    DRY_RUN: If set to a non-empty string, only print what images would be updated"
     echo "Example:"
-    echo "    ${0} dev nginx 0.0.2"
+    echo "    ${0} ./k8s/overlays/dev ghcr.io/slarwise/version-promote:0.0.2"
     exit 1
 fi
 
-ENV="$1"
+DIR="$1"
 IMAGE="$2"
-TAG="$3"
 
-if [ "$ENV" == "dev" ]; then
-    if [ -z "$DRY_RUN" ]; then
-        (cd k8s/overlays/dev && kustomize edit set image "$IMAGE":"$TAG")
-    else
-        echo "Would update dev image to ${IMAGE}:${TAG}"
-    fi
-elif [ "$ENV" == "prod" ]; then
-    if [ -z "$DRY_RUN" ]; then
-        (cd k8s/overlays/prod && kustomize edit set image "$IMAGE":"$TAG")
-    else
-        echo "Would update prod image to ${IMAGE}:${TAG}"
-    fi
+if [ -z "$DRY_RUN" ]; then
+    (cd "$DIR" && kustomize edit set image "$IMAGE")
 else
-    echo "Environment must be one of dev or prod, got ${ENV}"
-    exit 1
+    echo "Would update image to ${IMAGE} in ${DIR}"
 fi
