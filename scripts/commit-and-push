@@ -1,0 +1,17 @@
+#!/bin/bash
+
+if [ "$#" -ne 2 ]; then
+    echo "Usage: ${0} <branch> <message>"
+    exit 1
+fi
+
+BRANCH="$1"
+MESSAGE="$2"
+if [ -z "$DRY_RUN" ]; then
+    git fetch origin "$BRANCH"
+    git checkout "$BRANCH"
+    git commit -a -m "$MESSAGE"
+    git push --set-upstream origin "$BRANCH"
+else
+    echo "Would push '${MESSAGE}' to ${BRANCH}"
+fi

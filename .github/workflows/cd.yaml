@@ -1,4 +1,4 @@
-run-name: ${{ inputs.dry_run && '[DRY RUN] ' }}Push and deploy new image tags
+run-name: ${{ inputs.dry_run && '[DRY RUN] ' || '' }}Push and deploy new image tags
 permissions:
   contents: write
   pull-requests: write
@@ -19,83 +19,32 @@ on:
       - 'README.md'
       - '.github/**'
       - 'scripts/**'
+env:
+  DRY_RUN: ${{ inputs.dry_run && 'true' || '' }}
+  REPO: ghcr.io/slarwise/version-promote
+  USERNAME: ${{ github.actor }}
+  EMAIL: "bot@github.com"
+  GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  PR_BRANCH_PREFIX: "promote/prod"
 jobs:
-  compute-image-tag:
+  deploy:
     runs-on: ubuntu-latest
-    outputs:
-      image-tag: ${{ steps.compute-image-tag.outputs.image_tag }}
     steps:
       - uses: actions/checkout@v4
-      - name: Compute image tag (use the current commit hash)
-        id: compute-image-tag
+      - name: "Create new image tag"
         run: |
-          IMAGE_TAG="$(./scripts/get-current-commit-hash)"
-          echo "image_tag=${IMAGE_TAG}" >> "$GITHUB_OUTPUT"
-  push-image:
-    runs-on: ubuntu-latest
-    needs: compute-image-tag
-    env:
-      TAG: ${{ needs.compute-image-tag.outputs.image-tag }}
-      DRY_RUN: ${{ inputs.dry_run && 'true' || '' }}
-    steps:
-      - uses: actions/checkout@v4
-      - name: Login to Github Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and push image
-        run: |
-          IMAGE="ghcr.io/slarwise/version-promote:${TAG}"
-          docker build --tag "$IMAGE" .
-          if [ -z "$DRY_RUN" ]; then
-            docker push "$IMAGE"
-          else
-            echo "Would push image ${IMAGE}" >> $GITHUB_STEP_SUMMARY
-          fi
-  update-image-tags:
-    runs-on: ubuntu-latest
-    needs: compute-image-tag
-    env:
-      TAG: ${{ needs.compute-image-tag.outputs.image-tag }}
-      GH_TOKEN: ${{ github.token }}
-      BOT_USER: "github-actions[bot]"
-      BOT_EMAIL: "bot@github.com"
-      IMAGE: version-promote
-      DRY_RUN: ${{ inputs.dry_run && 'true' || '' }}
-      PR_BRANCH_PREFIX: "promote/prod"
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set username and email
-        run: |
-          git config user.name $BOT_USER
-          git config user.email $BOT_EMAIL
-      - name: Update the image tag in dev
-        run: |
-          ./scripts/update-image-tag dev "$IMAGE" "$TAG"
-      - name: Commit and push to main
-        run: |
-          if [ -z "$DRY_RUN" ]; then
-            git commit -a -m "Update image tag in dev to ${TAG}"
-            git push
-          else
-            echo "Would push updated dev image to main. Tag: ${TAG}" >> $GITHUB_STEP_SUMMARY
-          fi
-      - name: Update the image tag in prod
-        run: |
-          ./scripts/update-image-tag prod "$IMAGE" "$TAG"
-      - name: Close any previous PR's
-        run: |
-          ./scripts/close-all-prs-matching-branch-prefix "$PR_BRANCH_PREFIX"
-      - name: Create PR
-        run: |
-          BRANCH_NAME="${PR_BRANCH_PREFIX}/${TAG}"
-          git checkout -b "$BRANCH_NAME"
-          if [ -z "$DRY_RUN" ]; then
-            git commit -a -m "Update image tag in prod to ${TAG}"
-            git push --set-upstream origin "$BRANCH_NAME"
-            gh pr create --fill
-          else
-            echo "Would create PR for updated prod image. Tag: ${TAG}. Branch: ${BRANCH_NAME}" >> $GITHUB_STEP_SUMMARY
-          fi
+          TAG="$(./scripts/get-current-commit-hash)"
+          IMAGE="${REPO}:${TAG}"
+          echo "TAG=${TAG}" >> "$GITHUB_ENV"
+          echo "IMAGE=${IMAGE}" >> "$GITHUB_ENV"
+          echo "Image to deploy: ${IMAGE}" >> "$GITHUB_STEP_SUMMARY"
+      - run: ./scripts/build-image "$IMAGE"
+      - run: ./scripts/login-to-ghcr "$USERNAME" "$GHCR_TOKEN" >> "$GITHUB_STEP_SUMMARY"
+      - run: ./scripts/push-image "$IMAGE" >> "$GITHUB_STEP_SUMMARY"
+      - run: ./scripts/update-image-tag ./k8s/overlays/dev "$IMAGE" >> "$GITHUB_STEP_SUMMARY"
+      - run: ./scripts/set-git-user "$USERNAME" "$EMAIL" >> "$GITHUB_STEP_SUMMARY"
+      - run: ./scripts/commit-and-push main "Promote dev deployment to ${IMAGE}" >> "$GITHUB_STEP_SUMMARY"
+      - run: ./scripts/update-image-tag ./k8s/overlays/prod "$IMAGE" >> "$GITHUB_STEP_SUMMARY"
+      - run: ./scripts/close-all-prs-matching-branch-prefix "$PR_BRANCH_PREFIX" >> "$GITHUB_STEP_SUMMARY"
+      - run: ./scripts/commit-and-push "${PR_BRANCH_PREFIX}/${TAG}" "Promote prod deployment to ${IMAGE}" >> "$GITHUB_STEP_SUMMARY"
+      - run: ./scripts/create-pr "${PR_BRANCH_PREFIX}/${TAG}" >> "$GITHUB_STEP_SUMMARY"
