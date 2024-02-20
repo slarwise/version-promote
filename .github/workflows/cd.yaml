@@ -24,7 +24,7 @@ env:
   REPO: ghcr.io/slarwise/version-promote
   USERNAME: ${{ github.actor }}
   EMAIL: "bot@github.com"
-  GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   PR_BRANCH_PREFIX: "promote/prod"
 jobs:
   deploy:
@@ -39,7 +39,7 @@ jobs:
           echo "IMAGE=${IMAGE}" >> "$GITHUB_ENV"
           echo "Image to deploy: ${IMAGE}" >> "$GITHUB_STEP_SUMMARY"
       - run: ./scripts/build-image "$IMAGE"
-      - run: ./scripts/login-to-ghcr "$USERNAME" "$GHCR_TOKEN" >> "$GITHUB_STEP_SUMMARY"
+      - run: ./scripts/login-to-ghcr "$USERNAME" "$GH_TOKEN" >> "$GITHUB_STEP_SUMMARY"
       - run: ./scripts/push-image "$IMAGE" >> "$GITHUB_STEP_SUMMARY"
       - run: ./scripts/update-image-tag ./k8s/overlays/dev "$IMAGE" >> "$GITHUB_STEP_SUMMARY"
       - run: ./scripts/set-git-user "$USERNAME" "$EMAIL" >> "$GITHUB_STEP_SUMMARY"
