@@ -8,11 +8,7 @@ fi
 BRANCH="$1"
 MESSAGE="$2"
 if [ -z "$DRY_RUN" ]; then
-    # Check if the branch exists
-    if git show-ref --quiet --verify "refs/heads/${BRANCH}"; then
-        git fetch origin "$BRANCH"
-        git checkout "$BRANCH"
-        git pull
+    if [[ "$BRANCH" == "main" ]]; then
         git commit -a -m "$MESSAGE"
         git push
     else
