@@ -4,6 +4,6 @@ resources:
 - ../../base
 images:
 - name: ghcr.io/slarwise/version-promote
-  newTag: 60a06eb
+  newTag: 1e2ed66
 - name: version-promote
   newTag: f88a573
