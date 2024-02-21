@@ -49,7 +49,7 @@ if [[ -z "$DRY_RUN" ]]; then
     else
         git -c user.name="$GIT_USER" -c user.email="$GIT_EMAIL" commit -am "$MSG"
     fi
-    git checkout "$BRANCH"
+    git checkout -b "$BRANCH"
     gh pr create --fill
 else
     echo "Would create PR with updated image and message: ${MSG}"
