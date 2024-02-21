@@ -48,7 +48,7 @@ if [[ -z "$DRY_RUN" ]]; then
     if [[ -z "$GIT_USER" || -z "$GIT_EMAIL" ]]; then
         git commit -am "$MSG"
     else
-        git commit -c user.name="$GIT_USER" -c user.email="$GIT_EMAIL" -am "$MSG"
+        git -c user.name="$GIT_USER" -c user.email="$GIT_EMAIL" commit -am "$MSG"
     fi
     git checkout "$BRANCH"
     gh pr create --fill
