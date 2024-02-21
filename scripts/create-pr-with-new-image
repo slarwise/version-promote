@@ -37,6 +37,7 @@ fi
 for PR in $PRS; do
     if [ -z "$DRY_RUN" ]; then
         gh pr close --delete-branch "$PR"
+        echo "Deleted pull request #${PR}"
     else
         echo "Would close pull request ${PR}"
     fi
