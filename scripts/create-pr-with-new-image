@@ -37,7 +37,7 @@ echo "$PRS_TO_CLOSE"
 if [ -z "$PRS_TO_CLOSE" ]; then
     echo "No pull requests found from branch ${BRANCH}"
 fi
-for PR in $PRS; do
+for PR in $PRS_TO_CLOSE; do
     if [ -z "$DRY_RUN" ]; then
         gh pr close --delete-branch "$PR"
         echo "Deleted pull request #${PR}"
