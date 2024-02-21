@@ -34,7 +34,7 @@ ALL_PRS="$(gh pr list --json headRefName,number)"
 echo "$ALL_PRS"
 PRS_TO_CLOSE="$(gh pr list --json headRefName,number | jq --arg branch "$BRANCH" 'map(select(.headRefName == $branch)) | .[].number')"
 echo "$PRS_TO_CLOSE"
-if [ -z "$PRS" ]; then
+if [ -z "$PRS_TO_CLOSE" ]; then
     echo "No pull requests found from branch ${BRANCH}"
 fi
 for PR in $PRS; do
