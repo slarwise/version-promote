@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 if [[ "$#" -ne 3 ]]; then
     echo "ERROR: Must provide exactly three arguments, got ${#}"
     echo "Usage: ${0} environment kustomize-dir image"
