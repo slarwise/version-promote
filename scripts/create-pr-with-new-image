@@ -30,7 +30,7 @@ else
     echo "Would update image to ${IMAGE} in ${DIR}"
 fi
 
-PRS_TO_CLOSE="$(gh pr list --json headRefName,number | jq --arg branch "$BRANCH" 'map(select(.headRefName == $branch) | .[].number')"
+PRS_TO_CLOSE="$(gh pr list --json headRefName,number | jq --arg branch "$BRANCH" 'map(select(.headRefName == $branch)) | .[].number')"
 if [ -z "$PRS" ]; then
     echo "No pull requests found with branches starting with ${PREFIX}"
     exit 0
