@@ -33,7 +33,7 @@ jobs:
         run: |
           TAG="$(scripts/get-current-commit-hash)"
           echo "TAG=${TAG}" >> "$GITHUB_ENV"
-          echo "IMAGE=${REPO}:${TAG}" >> "$GITHUB_ENV"
+          echo "IMAGE=${IMAGE_REPO}:${TAG}" >> "$GITHUB_ENV"
       - name: Update dev deployment and push it
         run: ./scripts/merge-new-image dev ./k8s/overlays/dev "$IMAGE"
       - name: Update prod deployment and create a PR
