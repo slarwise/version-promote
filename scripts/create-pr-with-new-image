@@ -50,6 +50,7 @@ if [[ -z "$DRY_RUN" ]]; then
         git -c user.name="$GIT_USER" -c user.email="$GIT_EMAIL" commit -am "$MSG"
     fi
     git checkout -b "$BRANCH"
+    git push --set-upstream origin "$BRANCH"
     gh pr create --fill
 else
     echo "Would create PR with updated image and message: ${MSG}"
