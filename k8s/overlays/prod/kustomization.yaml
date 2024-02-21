@@ -1,7 +1,7 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - ../../base
+- ../../base
 images:
-  - name: ghcr.io/slarwise/version-promote
-    newTag: 60a06eb
+- name: ghcr.io/slarwise/version-promote
+  newTag: 57b7f55
