@@ -30,7 +30,7 @@ else
     echo "Would update image to ${IMAGE} in ${DIR}"
 fi
 
-ALL_PRS=gh pr list --json headRefName,number
+ALL_PRS="$(gh pr list --json headRefName,number)"
 echo "$ALL_PRS"
 PRS_TO_CLOSE="$(gh pr list --json headRefName,number | jq --arg branch "$BRANCH" 'map(select(.headRefName == $branch)) | .[].number')"
 echo "$PRS_TO_CLOSE"
