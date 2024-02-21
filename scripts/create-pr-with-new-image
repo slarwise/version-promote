@@ -33,7 +33,6 @@ fi
 PRS_TO_CLOSE="$(gh pr list --json headRefName,number | jq --arg branch "$BRANCH" 'map(select(.headRefName == $branch)) | .[].number')"
 if [ -z "$PRS" ]; then
     echo "No pull requests found from branch ${BRANCH}"
-    exit 0
 fi
 for PR in $PRS; do
     if [ -z "$DRY_RUN" ]; then
