@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
 - ../../base
 images:
+- newTag: c8a680e
 - name: ghcr.io/slarwise/version-promote
   newTag: 0.0.2
 - name: version-promote
