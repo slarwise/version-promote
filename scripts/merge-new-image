@@ -1,0 +1,40 @@
+#!/bin/bash
+
+if [[ "$#" -ne 3 ]]; then
+    echo "ERROR: Must provide exactly three arguments, got ${#}"
+    echo "Usage: ${0} environment kustomize-dir image"
+    echo "    environment: Name of the environment, e.g. dev or prod"
+    echo "    kustomize-dir: Path to directory with kustomization to update"
+    echo "    image: The container image to update to, e.g. ghcr.io/slarwise/version-promote:0.0.2"
+    echo
+    echo "Example:"
+    echo "    ${0} dev ./k8s/overlays/dev ghcr.io/slarwise/version-promote:0.0.2"
+    echo
+    echo "Environment variables:"
+    echo "    DRY_RUN: If non-empty, only print what would be done"
+    echo "    GIT_USER: If non-empty, use this as user.name when commiting. Use to override the git configuration file."
+    echo "    GIT_EMAIL: If non-empty, use this as user.email when commiting. Use to override the current git configuration file."
+    exit 1
+fi
+
+ENV="$1"
+DIR="$2"
+IMAGE="$3"
+
+if [[ -z "$DRY_RUN" ]]; then
+    (cd "$DIR" && kustomize edit set image "$IMAGE")
+else
+    echo "Would update image to ${IMAGE} in ${DIR}"
+fi
+
+MSG="Update ${ENV} image to ${IMAGE}"
+if [[ -z "$DRY_RUN" ]]; then
+    if [[ -z "$GIT_USER" || -z "$GIT_EMAIL" ]]; then
+        git commit -am "$MSG"
+    else
+        git commit -c user.name="$GIT_USER" -c user.email="$GIT_EMAIL" -am "$MSG"
+    fi
+    git push
+else
+    echo "Would push updated image with message: ${MSG}"
+fi
