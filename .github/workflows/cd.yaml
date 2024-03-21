@@ -32,7 +32,7 @@ jobs:
           MSG="Promote dev to ${IMAGE}"
           git -c user.name="$NAME" -c user.email="$EMAIL" commit -am "[skip ci]: ${MSG}"
           git push -u origin promote/dev
-          gh pr create --title "$MSG" --body ""
+          gh pr create --title "$MSG" --body "[skip ci]"
           gh pr merge --auto --merge --delete-branch
       - name: Create PR to promote prod
         run: |
@@ -43,4 +43,4 @@ jobs:
           MSG="Promote prod to ${IMAGE}"
           git -c user.name="$NAME" -c user.email="$EMAIL" commit -am "[skip ci]: $MSG"
           git push -u origin promote/prod
-          gh pr create --title "$MSG" --body ""
+          gh pr create --title "$MSG" --body "[skip ci]"
