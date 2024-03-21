@@ -13,28 +13,33 @@ on:
   push:
     branches:
       - main
-    paths-ignore:
-      - 'k8s/**'
-      - 'README.md'
-      - '.github/**'
-      - 'scripts/**'
 env:
-  DRY_RUN: ${{ inputs.dry_run && 'true' || '' }}
-  IMAGE_REPO: ghcr.io/slarwise/version-promote
-  GIT_USER: ${{ github.actor }}
-  GIT_EMAIL: "bot@github.com"
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  IMAGE: ghcr.io/slarwise/version-promote
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Set the new image version to the current commit and expose it as $IMAGE
+      - name: Set the tag to the current abbreviated commit
+        run: echo "TAG=$(git rev-parse --short HEAD)" >> "$GITHUB_ENV"
+      - name: Create PR to promote dev and merge if possible
         run: |
-          TAG="$(scripts/get-current-commit-hash)"
-          echo "TAG=${TAG}" >> "$GITHUB_ENV"
-          echo "IMAGE=${IMAGE_REPO}:${TAG}" >> "$GITHUB_ENV"
-      - name: Update dev deployment and push it
-        run: ./scripts/merge-new-image dev ./k8s/overlays/dev "$IMAGE"
-      - name: Update prod deployment and create a PR
-        run: ./scripts/create-pr-with-new-image prod ./k8s/overlays/prod "$IMAGE"
+          gh pr close --delete-branch promote/dev || true
+          git checkout -b promote/dev
+          (cd ./k8s/overlays/dev && kustomize edit set image "${IMAGE}:${TAG}")
+          MSG="Promote dev to ${IMAGE}:${TAG}"
+          git -c user.name=${{ github.actor }} -c user.email=bot@github.com commit -am "$MSG"
+          git push -u origin promote/dev
+          gh pr create --fill
+          gh pr merge --auto
+      - name: Create PR to promote prod
+        run: |
+          gh pr close --delete-branch promote/prod
+          git checkout -b promote/prod
+          (cd ./k8s/overlays/prod && kustomize edit set image "${IMAGE}:${TAG}")
+          MSG="Promote prod to ${IMAGE}:${TAG}"
+          git -c user.name=${{ github.actor }} -c user.email=bot@github.com commit -am "$MSG"
+          git push -u origin promote/prod
+          gh pr create --fill
+          gh pr merge --auto
