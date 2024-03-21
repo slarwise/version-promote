@@ -25,6 +25,7 @@ jobs:
         run: echo "TAG=$(git rev-parse --short HEAD)" >> "$GITHUB_ENV"
       - name: Create PR to promote dev and merge if possible
         run: |
+          set -x
           gh pr close --delete-branch promote/dev || true
           git checkout -b promote/dev
           (cd ./k8s/overlays/dev && kustomize edit set image "${IMAGE}:${TAG}")
@@ -32,9 +33,10 @@ jobs:
           git -c user.name=${{ github.actor }} -c user.email=bot@github.com commit -am "$MSG"
           git push -u origin promote/dev
           gh pr create --fill
-          gh pr merge --auto
+          gh pr merge --auto --merge
       - name: Create PR to promote prod
         run: |
+          set -x
           gh pr close --delete-branch promote/prod
           git checkout -b promote/prod
           (cd ./k8s/overlays/prod && kustomize edit set image "${IMAGE}:${TAG}")
@@ -42,4 +44,4 @@ jobs:
           git -c user.name=${{ github.actor }} -c user.email=bot@github.com commit -am "$MSG"
           git push -u origin promote/prod
           gh pr create --fill
-          gh pr merge --auto
+          gh pr merge --auto --merge
