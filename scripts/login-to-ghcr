@@ -1,6 +1,0 @@
-#!/bin/bash
-
-USERNAME="$1"
-TOKEN="$2"
-
-echo "$TOKEN" | docker login --password-stdin --username "$USERNAME" ghcr.io
