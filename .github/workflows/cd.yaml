@@ -1,15 +1,7 @@
-run-name: ${{ inputs.dry_run && '[DRY RUN] ' || '' }}Deploy new image tags
 permissions:
   contents: write
   pull-requests: write
 on:
-  workflow_dispatch:
-    inputs:
-      dry_run:
-        description: "Don't deploy anything, only print what would be done"
-        required: false
-        default: false
-        type: boolean
   push:
     branches:
       - main
@@ -27,6 +19,10 @@ jobs:
           set -x
           TAG="$(git rev-parse --short HEAD)"
           echo "IMAGE=ghcr.io/slarwise/version-promote:${TAG}" >> "$GITHUB_ENV"
+      - name: Pretend to build an image
+        run: echo "Build a docker image called ${IMAGE}"
+      - name: Pretend to push the image
+        run: echo "Push image ${IMAGE}"
       - name: Create PR to promote dev and merge if possible
         run: |
           set -x
