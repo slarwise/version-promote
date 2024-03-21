@@ -6,3 +6,4 @@ images:
 - name: ghcr.io/slarwise/version-promote
   newTag: 60a06eb
 - name: ghcr.io/slarwise/version-promote:8a30300
+- name: ghcr.io/slarwise/version-promote:939cc4f
