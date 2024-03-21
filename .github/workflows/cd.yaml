@@ -28,7 +28,7 @@ jobs:
           set -x
           gh pr close --delete-branch promote/dev || true
           git checkout -b promote/dev
-          (cd ./k8s/overlays/dev && kustomize edit set image "$IMAGE")
+          (cd ./k8s/dev && kustomize edit set image "$IMAGE")
           MSG="[skip ci]: Promote dev to ${IMAGE}"
           git -c user.name="$NAME" -c user.email="$EMAIL" commit -am "$MSG"
           git push -u origin promote/dev
@@ -39,7 +39,7 @@ jobs:
           set -x
           gh pr close --delete-branch promote/prod || true
           git checkout -b promote/prod
-          (cd ./k8s/overlays/prod && kustomize edit set image "${IMAGE}")
+          (cd ./k8s/prod && kustomize edit set image "${IMAGE}")
           MSG="[skip ci]: Promote prod to ${IMAGE}"
           git -c user.name="$NAME" -c user.email="$EMAIL" commit -am "$MSG"
           git push -u origin promote/prod

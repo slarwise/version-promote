@@ -1,21 +1,21 @@
-# Promote an image tag with PR:s
+# Promote deployment manifests using PRs and github workflows
 
-Different ideas for how to update the image tags on different deployments.
-Assume that we have two environments: dev and prod. Goal: The image is updated
-automatically in the gitops repository for dev when a new image is available. A
-PR is created to make the same change to the gitops repo for prod.
+A simple way to update deployment manifests using PRs and github workflows.
+Whenever a commit is pushed to main, a PR is created that updates the image tag
+for the dev deployment. This PR is merged as soon as all required PR checks have
+passed. A second PR is then created to do the same update to prod, but is not
+merged.
 
-## Examples of stuff that can trigger the promotion
+Creating a PR for the dev environment is necessary if pushing directly to the
+default branch is prohibited.
 
-- The pipeline that pushes the image, e.g. on every commit or when a git tag is
-  pushed
-- Webhook from image registry when a new image is published
+[kustomize](https://kustomize.io/) is used to update the deployment manifests.
+Other than that, no dependencies or external github actions are needed. See the
+[workflow](./.github/workflows/cd.yaml) for all details.
 
 ```mermaid
 flowchart LR
-    A1([Update to application triggers image build]) -.-> B([Bot promotes dev])
-    A2([New git tag triggers image build]) -.-> B
-    A3([Image registry notifies that a new image exists]) -.-> B
+    A([Code push]) -.-> B([Bot promotes dev])
     B --> C([Bot creates PR to promote prod])
     C --> D([Non-bot merges PR])
 ```
