@@ -16,7 +16,8 @@ See the [workflow](./.github/workflows/cd.yaml) for all details.
 
 ```mermaid
 flowchart LR
-    A([Code push]) --> B([Bot promotes dev])
-    A --> C([Bot creates PR to promote prod])
-    C --> D([Non-bot merges PR])
+    A([Code push]) --> B1([Bot creates PR to promote dev])
+    B1 --> B2([Bot merges PR])
+    A --> C1([Bot creates PR to promote prod])
+    C1 --> C2([Non-bot merges PR])
 ```
