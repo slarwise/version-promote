@@ -16,7 +16,7 @@ that, no dependencies or external github actions are needed. See the
 
 ```mermaid
 flowchart LR
-    A([Code push]) -.-> B([Bot promotes dev])
-    B --> C([Bot creates PR to promote prod])
+    A([Code push]) --> B([Bot promotes dev])
+    A --> C([Bot creates PR to promote prod])
     C --> D([Non-bot merges PR])
 ```
