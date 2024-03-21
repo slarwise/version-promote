@@ -19,6 +19,7 @@ jobs:
           set -x
           TAG="$(git rev-parse --short HEAD)"
           echo "IMAGE=ghcr.io/slarwise/version-promote:${TAG}" >> "$GITHUB_ENV"
+          echo "IMAGE_SHORT=version-promote:${TAG}" >> "$GITHUB_ENV"
       - name: Pretend to build an image
         run: echo "Build a docker image called ${IMAGE}"
       - name: Pretend to push the image
@@ -29,7 +30,7 @@ jobs:
           gh pr close --delete-branch promote/dev || true
           git checkout -b promote/dev
           (cd ./k8s/dev && kustomize edit set image "$IMAGE")
-          MSG="Promote dev to ${IMAGE}"
+          MSG="Promote dev to ${IMAGE_SHORT}"
           git -c user.name="$NAME" -c user.email="$EMAIL" commit -am "[skip ci]: ${MSG}"
           git push -u origin promote/dev
           gh pr create --title "$MSG" --body "[skip ci]"
@@ -40,7 +41,7 @@ jobs:
           gh pr close --delete-branch promote/prod || true
           git checkout -b promote/prod
           (cd ./k8s/prod && kustomize edit set image "${IMAGE}")
-          MSG="Promote prod to ${IMAGE}"
+          MSG="Promote prod to ${IMAGE_SHORT}"
           git -c user.name="$NAME" -c user.email="$EMAIL" commit -am "[skip ci]: $MSG"
           git push -u origin promote/prod
           gh pr create --title "$MSG" --body "[skip ci]"
