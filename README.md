@@ -12,7 +12,7 @@ default branch is prohibited.
 [kustomize](https://kustomize.io/) is used to update the deployment manifests,
 and is a tool that is usually installed by default on github runners. Other than
 that, no dependencies or external github actions are needed. See the
-[workflow](./.github/workflows/cd.yaml) for all details.
+[workflow](./.github/workflows/cd.yaml) for all details. asdfasdf
 
 ```mermaid
 flowchart LR
